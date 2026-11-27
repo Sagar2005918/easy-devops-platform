@@ -66,12 +66,12 @@ The workflow deliberately does not create cloud resources or expose credentials.
 
 ## Infrastructure and cluster bootstrap
 
-Terraform provisions an AWS VPC and EKS cluster. Review cost and security settings first. Configure a remote, encrypted Terraform state backend with locking before team use. Set `allowed_admin_cidrs` to your trusted public IP `/32` before applying; the default empty list intentionally leaves public API access unavailable.
+Terraform provisions an AWS VPC and EKS cluster. Review cost and security settings first. Configure a remote, encrypted Terraform state backend with locking before team use. Set `allowed_admin_cidrs` to your trusted public IP `/32` before planning; Terraform requires this input and rejects an empty list.
 
 ```bash
 cd infra/terraform
 terraform init
-terraform plan -out=tfplan
+terraform plan -var='allowed_admin_cidrs=["YOUR.PUBLIC.IP/32"]' -out=tfplan
 terraform apply tfplan
 aws eks update-kubeconfig --region ap-south-1 --name easy-devops-task-api
 ```
