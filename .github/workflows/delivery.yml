@@ -18,7 +18,7 @@ jobs:
           python-version: '3.12'
           cache: pip
       - run: pip install -r requirements-dev.txt
-      - run: pytest -q
+      - run: python -m pytest -q
       - name: Static security scan
         run: bandit -q -r app.py
       - name: Dependency audit
@@ -87,4 +87,3 @@ jobs:
         run: |
           kubectl argo rollouts set image task-api task-api=ghcr.io/${{ github.repository }}:sha-${{ github.sha }} -n task-api
           kubectl argo rollouts status task-api -n task-api --timeout=5m
-
