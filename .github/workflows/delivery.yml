@@ -37,10 +37,13 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Resolve lowercase image name
+        id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
       - uses: docker/metadata-action@v5
         id: meta
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ${{ steps.image.outputs.name }}
           tags: |
             type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
@@ -53,7 +56,7 @@ jobs:
       - name: Scan published image
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: ghcr.io/${{ github.repository }}:sha-${{ github.sha }}
+          image-ref: ${{ steps.image.outputs.name }}:sha-${{ github.sha }}
           format: table
           exit-code: '1'
           ignore-unfixed: true
@@ -84,6 +87,9 @@ jobs:
             --docker-password="${{ secrets.GHCR_PULL_TOKEN }}" \
             --dry-run=client -o yaml | kubectl apply -f -
       - name: Deploy canary image
+        env:
+          IMAGE_NAME: ghcr.io/${{ github.repository }}
         run: |
-          kubectl argo rollouts set image task-api task-api=ghcr.io/${{ github.repository }}:sha-${{ github.sha }} -n task-api
+          image_name="${IMAGE_NAME,,}"
+          kubectl argo rollouts set image task-api task-api="$image_name:sha-${GITHUB_SHA}" -n task-api
           kubectl argo rollouts status task-api -n task-api --timeout=5m
