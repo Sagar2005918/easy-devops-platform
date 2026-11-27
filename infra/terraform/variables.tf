@@ -16,7 +16,10 @@ variable "kubernetes_version" {
 }
 
 variable "allowed_admin_cidrs" {
-  description = "Your trusted public IPv4 CIDR(s), for example [\"203.0.113.10/32\"]. Set these before applying."
+  description = "Trusted public IPv4 CIDR(s), for example [\"203.0.113.10/32\"]. Required to restrict public EKS API access."
   type        = list(string)
-  default     = []
+  validation {
+    condition     = length(var.allowed_admin_cidrs) > 0
+    error_message = "Set at least one trusted CIDR; do not expose the EKS API to every IP."
+  }
 }
