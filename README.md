@@ -56,13 +56,13 @@ docker run --rm -p 8080:8080 easy-devops-task-api:local
 
 ### One-time GitHub Actions configuration
 
-Create a GitHub Environment named `production` and add these repository/environment secrets:
+Create a GitHub Environment named `production`, set the repository variable `DEPLOY_ENABLED` to `true`, and add these repository/environment secrets:
 
 - `KUBE_CONFIG`: base64-encoded kubeconfig for the target cluster. Give this identity only the namespace-scoped permissions needed by the deployment workflow.
 - `GHCR_USERNAME`: GitHub username allowed to read the package.
 - `GHCR_PULL_TOKEN`: fine-grained token with read access to the package. Keep it private and rotate it.
 
-The workflow deliberately does not create cloud resources or expose credentials. Apply Terraform and bootstrap cluster components as described below before enabling the `production` deployment environment.
+The deployment job remains skipped until `DEPLOY_ENABLED=true`. The workflow deliberately does not create cloud resources or expose credentials. Apply Terraform and bootstrap cluster components as described below before enabling deployment.
 
 ## Infrastructure and cluster bootstrap
 
