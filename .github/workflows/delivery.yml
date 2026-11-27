@@ -24,7 +24,7 @@ jobs:
       - name: Dependency audit
         run: pip-audit -r requirements.txt
       - name: Secret scan
-        uses: gitleaks/gitleaks-action@v2
+        run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.28.0 detect --source=/repo --no-git --redact --exit-code 1
   image:
     if: github.event_name != 'pull_request'
     needs: verify
@@ -87,3 +87,4 @@ jobs:
         run: |
           kubectl argo rollouts set image task-api task-api=ghcr.io/${{ github.repository }}:sha-${{ github.sha }} -n task-api
           kubectl argo rollouts status task-api -n task-api --timeout=5m
+
