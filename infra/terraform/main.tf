@@ -17,9 +17,9 @@ module "vpc" {
   single_nat_gateway   = true
   enable_dns_hostnames = true
 
-  public_subnet_tags = { "kubernetes.io/role/elb" = "1" }
+  public_subnet_tags  = { "kubernetes.io/role/elb" = "1" }
   private_subnet_tags = {
-    "kubernetes.io/role/internal-elb" = "1"
+    "kubernetes.io/role/internal-elb"          = "1"
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 }
@@ -28,10 +28,10 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "20.37.1"
 
-  cluster_name                   = var.cluster_name
-  cluster_version                = var.kubernetes_version
-  cluster_endpoint_public_access  = true
-  cluster_endpoint_private_access = true
+  cluster_name                        = var.cluster_name
+  cluster_version                     = var.kubernetes_version
+  cluster_endpoint_public_access      = true
+  cluster_endpoint_private_access     = true
   cluster_endpoint_public_access_cidrs = var.allowed_admin_cidrs
 
   vpc_id     = module.vpc.vpc_id
