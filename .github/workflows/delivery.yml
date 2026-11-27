@@ -9,6 +9,20 @@ permissions:
   packages: write
   security-events: write
 jobs:
+  terraform:
+    name: validate-infrastructure
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra/terraform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+      - run: terraform fmt -check -recursive
+      - run: terraform init -backend=false
+      - run: terraform validate
   verify:
     runs-on: ubuntu-latest
     steps:
@@ -27,7 +41,7 @@ jobs:
         run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.28.0 detect --source=/repo --no-git --redact --exit-code 1
   image:
     if: github.event_name != 'pull_request'
-    needs: verify
+    needs: [verify, terraform]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

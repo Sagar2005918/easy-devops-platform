@@ -12,7 +12,7 @@ variable "cluster_name" {
 variable "kubernetes_version" {
   description = "EKS Kubernetes minor version supported by your AWS region."
   type        = string
-  default     = "1.31"
+  default     = "1.37"
 }
 
 variable "allowed_admin_cidrs" {
