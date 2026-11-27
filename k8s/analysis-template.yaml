@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: task-api-error-rate
+  namespace: task-api
+spec:
+  metrics:
+    - name: http-error-rate
+      interval: 30s
+      count: 3
+      failureLimit: 2
+      successCondition: result[0] < 0.05
+      provider:
+        prometheus:
+          address: http://prometheus-operated.monitoring.svc:9090
+          query: |
+            (sum(rate(app_responses_total{status=~"5..",app="task-api"}[2m])) or vector(0))
+            /
+            clamp_min((sum(rate(app_responses_total{app="task-api"}[2m])) or vector(0)), 0.001)

@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: task-api-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: task-api
+      rules:
+        - alert: TaskApiDown
+          expr: up{namespace="task-api",service="task-api-stable"} == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: Task API metrics target is down
+        - alert: TaskApiHigh5xxRate
+          expr: sum(rate(app_responses_total{status=~"5.."}[5m])) / clamp_min(sum(rate(app_responses_total[5m])), 0.001) > 0.05
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: Task API 5xx response rate is above 5 percent
